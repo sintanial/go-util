@@ -6,6 +6,8 @@ import (
 	"net/http/httputil"
 	"net"
 	"github.com/sintanial/go-util/netutil"
+	"bytes"
+	"io/ioutil"
 )
 
 func NewResponse(statusCode int, status string, headers http.Header) *http.Response {
@@ -18,6 +20,17 @@ func NewResponse(statusCode int, status string, headers http.Header) *http.Respo
 
 	if headers != nil {
 		res.Header = headers
+	}
+
+	return res
+}
+
+func NewResponseBody(statusCode int, status string, headers http.Header, body []byte) *http.Response {
+	res := NewResponse(statusCode, status, headers)
+
+	if body != nil {
+		buf := bytes.NewBuffer(body)
+		res.Body = ioutil.NopCloser(buf)
 	}
 
 	return res
