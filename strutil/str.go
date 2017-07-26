@@ -20,6 +20,10 @@ func IndexOf(search string, list []string) int {
 }
 
 func Contains(search string, list []string) bool {
+	if list == nil {
+		return false
+	}
+
 	for i := 0; i < len(list); i++ {
 		if strings.Contains(search, list[i]) {
 			return true
@@ -37,10 +41,14 @@ func Join(sep string, args ...interface{}) string {
 	var res []string
 	for _, arg := range args {
 		switch arg := arg.(type) {
-		case string: res = append(res, arg)
-		case bool: res = append(res, strconv.FormatBool(arg))
-		case int: res = append(res, strconv.Itoa(arg))
-		case float64: res = append(res, strconv.FormatFloat(arg, 'f', -1, 64))
+		case string:
+			res = append(res, arg)
+		case bool:
+			res = append(res, strconv.FormatBool(arg))
+		case int:
+			res = append(res, strconv.Itoa(arg))
+		case float64:
+			res = append(res, strconv.FormatFloat(arg, 'f', -1, 64))
 		}
 	}
 
