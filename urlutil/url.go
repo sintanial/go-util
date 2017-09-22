@@ -1,6 +1,9 @@
 package urlutil
 
-import "strings"
+import (
+	"strings"
+	"net/url"
+)
 
 func SplitHostPort(s string) (host string, port string) {
 	split := strings.Split(s, ":")
@@ -19,4 +22,13 @@ func NormalizeHostPort(host string) string {
 	}
 
 	return host
+}
+
+func MustParseUrl(s string) *url.URL {
+	u, err := url.Parse(s)
+	if err != nil {
+		panic("failed to parse rawurl:" + err.Error())
+	}
+
+	return u
 }
