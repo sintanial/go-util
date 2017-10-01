@@ -56,7 +56,11 @@ func Join(sep string, args ...interface{}) string {
 }
 
 func Md5(data string) string {
-	uniqid := md5.Sum([]byte(data))
+	return Md5Byte([]byte(data))
+}
+
+func Md5Byte(data []byte) string {
+	uniqid := md5.Sum(data)
 	return hex.EncodeToString(uniqid[:])
 }
 

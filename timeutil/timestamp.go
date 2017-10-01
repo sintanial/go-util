@@ -19,8 +19,8 @@ func (self *Timestamp) UnmarshalJSON(b []byte) error {
 	tm, err := strconv.ParseInt(string(b), 10, 0)
 	if err != nil {
 		return &json.UnmarshalTypeError{
-			Value: "number " + string(b),
-			Type: reflect.TypeOf(0),
+			Value:  "number " + string(b),
+			Type:   reflect.TypeOf(0),
 			Offset: 0,
 		}
 	}
