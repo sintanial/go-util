@@ -15,6 +15,14 @@ func ParseInt(s string, def ...int) int {
 	return val
 }
 
+func Default(i int, def int) int {
+	if i == 0 {
+		return def
+	}
+
+	return i
+}
+
 func Contains(search int, list []int) bool {
 	for i := 0; i < len(list); i++ {
 		if search == list[i] {
@@ -45,11 +53,11 @@ func LeadingZero(i int) string {
 }
 
 func RandRange(min int, max int) int {
-	if max - min <= 0 {
+	if max-min <= 0 {
 		return 0
 	}
 
-	return min + rand.Intn(max - min)
+	return min + rand.Intn(max-min)
 }
 
 func Btoi(b bool) int {
@@ -110,4 +118,3 @@ func (self Range) RandSub(i int) int {
 
 	return 0
 }
-

@@ -7,12 +7,15 @@ import (
 )
 
 func ParseIP(addr string) net.IP {
-	host := strings.Split(addr, ":")[0]
-	if host == "" {
-		return nil
+	idx := strings.LastIndex(addr, ":")
+	if idx >= 0 {
+		addr = addr[:idx]
+		if addr == "" {
+			return nil
+		}
 	}
 
-	return net.ParseIP(host)
+	return net.ParseIP(addr)
 }
 
 func MustParseCIDR(s string) *net.IPNet {
