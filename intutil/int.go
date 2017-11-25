@@ -33,6 +33,13 @@ func Contains(search int, list []int) bool {
 	return false
 }
 
+func Shuffle(list []int) {
+	for i := range list {
+		j := rand.Intn(i + 1)
+		list[i], list[j] = list[j], list[i]
+	}
+}
+
 func IndexOf(search int, list []int) int {
 	for i := 0; i < len(list); i++ {
 		if search == list[i] {
