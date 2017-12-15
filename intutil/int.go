@@ -67,6 +67,17 @@ func RandRange(min int, max int) int {
 	return min + rand.Intn(max-min)
 }
 
+func Abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+
+	if x == 0 {
+		return 0
+	}
+	return x
+}
+
 func Btoi(b bool) int {
 	if b {
 		return 1
