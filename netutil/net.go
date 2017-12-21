@@ -3,19 +3,27 @@ package netutil
 import (
 	"net"
 	"strings"
+	"strconv"
 	"encoding/binary"
 )
 
 func ParseIP(addr string) net.IP {
-	idx := strings.LastIndex(addr, ":")
+	addr, _ = SplitHostPort(addr)
+	return net.ParseIP(addr)
+}
+
+func SplitHostPort(s string) (string, int) {
+	idx := strings.LastIndex(s, ":")
+	var host string
+	var port int
 	if idx >= 0 {
-		addr = addr[:idx]
-		if addr == "" {
-			return nil
-		}
+		host = s[:idx]
+		port, _ = strconv.Atoi(s[idx:])
+	} else {
+		host = s
 	}
 
-	return net.ParseIP(addr)
+	return host, port
 }
 
 func MustParseCIDR(s string) *net.IPNet {
