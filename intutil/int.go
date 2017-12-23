@@ -121,7 +121,7 @@ func (self Range) Rand() int {
 }
 
 func (self Range) In(i int) bool {
-	return i > self.Min
+	return i >= self.Min && i <= self.Max
 }
 
 func (self Range) RandSub(i int) int {

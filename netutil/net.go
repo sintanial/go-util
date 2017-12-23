@@ -18,7 +18,7 @@ func SplitHostPort(s string) (string, int) {
 	var port int
 	if idx >= 0 {
 		host = s[:idx]
-		port, _ = strconv.Atoi(s[idx:])
+		port, _ = strconv.Atoi(s[idx+1:])
 	} else {
 		host = s
 	}
