@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"net/http/httputil"
 	"net"
-	"github.com/sintanial/go-util/netutil"
+	"bitbucket.org/MountAim/go-util/netutil"
 	"bytes"
 	"io/ioutil"
 )
