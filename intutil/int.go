@@ -116,6 +116,10 @@ func ParseRange(s string, mindef, maxdef int) Range {
 	return Range{min, max}
 }
 
+func (self Range) IsZero() bool {
+	return self.Min == 0 && self.Max == 0
+}
+
 func (self Range) Rand() int {
 	return RandRange(self.Min, self.Max)
 }
