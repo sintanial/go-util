@@ -7,6 +7,30 @@ import (
 	"encoding/binary"
 )
 
+func GetIpFromAddr(addr net.Addr) net.IP {
+	switch a := addr.(type) {
+	case *net.TCPAddr:
+		return a.IP
+	case *net.UDPAddr:
+		return a.IP
+	case *net.IPAddr:
+		return a.IP
+	}
+
+	return ParseIP(addr.String())
+}
+
+func GetIpPortFromAddr(addr net.Addr) (net.IP, int) {
+	switch a := addr.(type) {
+	case *net.TCPAddr:
+		return a.IP, a.Port
+	case *net.UDPAddr:
+		return a.IP, a.Port
+	}
+
+	return nil, 0
+}
+
 func ParseIP(addr string) net.IP {
 	addr, _ = SplitHostPort(addr)
 	return net.ParseIP(addr)
