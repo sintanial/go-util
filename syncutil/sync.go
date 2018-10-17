@@ -12,7 +12,7 @@ type PeriodicalOnce struct {
 
 func (self *PeriodicalOnce) Do(period time.Duration, fn func()) {
 	self.mu.Lock()
-	if time.Now().Sub(self.executeAt) < self.Period {
+	if time.Now().Sub(self.executeAt) < period {
 		self.mu.Unlock()
 		return
 	}
