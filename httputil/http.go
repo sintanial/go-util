@@ -8,7 +8,33 @@ import (
 	"bitbucket.org/MountAim/go-util/netutil"
 	"bytes"
 	"io/ioutil"
+	"io"
+	"encoding/json"
 )
+
+func WriteJson(data interface{}, w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+	_, ok := r.URL.Query()["pretty"]
+	return WriteJsonTo(data, w, ok)
+}
+
+func WriteJsonTo(data interface{}, w io.Writer, isPretty bool) error {
+	var jdata []byte
+	var err error
+
+	if isPretty {
+		jdata, err = json.MarshalIndent(data, "", "  ")
+	} else {
+		jdata, err = json.Marshal(data)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	_, err = w.Write(jdata)
+	return err
+}
 
 func NewResponse(statusCode int, status string, headers http.Header) *http.Response {
 	res := &http.Response{
