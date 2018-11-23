@@ -36,6 +36,18 @@ func ParseIP(addr string) net.IP {
 	return net.ParseIP(addr)
 }
 
+func IsIP(s string) bool {
+	return ParseIP(s) != nil
+}
+
+func IsIPv4(address string) bool {
+	return strings.Count(address, ":") < 2
+}
+
+func IsIPv6(address string) bool {
+	return strings.Count(address, ":") >= 2
+}
+
 func SplitHostPort(s string) (string, int) {
 	idx := strings.LastIndex(s, ":")
 	var host string

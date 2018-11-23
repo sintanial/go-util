@@ -52,7 +52,6 @@ func (self *BufioReaderPool) Put(b *bufio.Reader) {
 	self.pool.Put(b)
 }
 
-
 type BytePool struct {
 	pool *sync.Pool
 }
@@ -73,4 +72,36 @@ func (self *BytePool) Get() []byte {
 
 func (self *BytePool) Put(b []byte) {
 	self.pool.Put(b)
+}
+
+type ResizableBytePool struct {
+	mu   sync.Mutex
+	pool map[int]*BytePool
+}
+
+func NewResizableBytePool() *ResizableBytePool {
+	return &ResizableBytePool{
+		pool: make(map[int]*BytePool),
+	}
+}
+
+func (self *ResizableBytePool) getPool(size int) *BytePool {
+	self.mu.Lock()
+	defer self.mu.Unlock()
+
+	p, ok := self.pool[size]
+	if !ok {
+		p = NewBytePool(size)
+		self.pool[size] = p
+	}
+
+	return p
+}
+
+func (self *ResizableBytePool) Get(size int) []byte {
+	return self.getPool(size).Get()
+}
+
+func (self *ResizableBytePool) Put(b []byte) {
+	self.getPool(len(b)).Put(b)
 }
