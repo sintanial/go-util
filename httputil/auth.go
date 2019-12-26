@@ -30,7 +30,7 @@ func ParseAuth(cs string) (username string, password string, ok bool) {
 }
 
 func SetAuth(h http.Header, username, password string) {
-	h.Set("Authorization", "Basic " + base64.StdEncoding.EncodeToString([]byte(username + ":" + password)))
+	h.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(username+":"+password)))
 }
 
 type HttpAuth struct {
@@ -123,4 +123,25 @@ func ParseBasicAuth(auth string) (username, password string, ok bool) {
 func BasicAuth(username, password string) string {
 	auth := username + ":" + password
 	return base64.StdEncoding.EncodeToString([]byte(auth))
+}
+
+func NewHttpAuthByCreds(creds string, realm string) *HttpAuth {
+	if creds == "" {
+		return nil
+	}
+
+	var credentials []*HttpAuthCredential
+	list := strings.Split(creds, ",")
+	for _, val := range list {
+		cred := ParseAuthCredential(val)
+		if cred != nil {
+			credentials = append(credentials, cred)
+		}
+	}
+
+	if len(credentials) == 0 {
+		return nil
+	}
+
+	return NewHttpAuth(credentials, realm)
 }
