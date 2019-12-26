@@ -1,14 +1,36 @@
 package httputil
 
 import (
-	"strings"
 	"encoding/base64"
 	"net/http"
+	"strings"
 )
 
 type HttpAuthCredential struct {
 	Username string
 	Password string
+}
+
+func ParseAuthCredential(cs string) *HttpAuthCredential {
+	u, p, ok := ParseAuth(cs)
+	if !ok {
+		return nil
+	}
+
+	return &HttpAuthCredential{u, p}
+}
+
+func ParseAuth(cs string) (username string, password string, ok bool) {
+	s := strings.IndexByte(cs, ':')
+	if s < 0 {
+		return
+	}
+
+	return cs[:s], cs[s+1:], true
+}
+
+func SetAuth(h http.Header, username, password string) {
+	h.Set("Authorization", "Basic " + base64.StdEncoding.EncodeToString([]byte(username + ":" + password)))
 }
 
 type HttpAuth struct {
@@ -39,8 +61,16 @@ func (self *HttpAuth) IsValidAuthRequest(r *http.Request) bool {
 	return false
 }
 
-func (self *HttpAuth) AuthHandler(handler func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (self *HttpAuth) AuthHandler(handler http.Handler) http.Handler {
+	return self.AuthHandlerFunc(handler.ServeHTTP)
+}
+
+func (self *HttpAuth) AuthHandlerFunc(handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if len(self.Creds) == 0 {
+			handler(w, r)
+			return
+		}
 		w.Header().Set("Access-Control-Allow-Origin", `*`)
 
 		if r.Method == "OPTIONS" {
@@ -64,12 +94,12 @@ func (self *HttpAuth) AuthHandler(handler func(w http.ResponseWriter, r *http.Re
 		}
 
 		handler(w, r)
-	}
+	})
 }
 
 func (self *HttpAuth) Auth(w http.ResponseWriter, r *http.Request) bool {
 	if !self.IsValidAuthRequest(r) {
-		w.Header().Set("WWW-Authenticate", `Basic realm="` + self.Realm + `"`)
+		w.Header().Set("WWW-Authenticate", `Basic realm="`+self.Realm+`"`)
 		w.WriteHeader(http.StatusUnauthorized)
 		return false
 	}
@@ -87,13 +117,7 @@ func ParseBasicAuth(auth string) (username, password string, ok bool) {
 		return
 	}
 
-	cs := string(c)
-	s := strings.IndexByte(cs, ':')
-	if s < 0 {
-		return
-	}
-
-	return cs[:s], cs[s + 1:], true
+	return ParseAuth(string(c))
 }
 
 func BasicAuth(username, password string) string {

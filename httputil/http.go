@@ -1,15 +1,15 @@
 package httputil
 
 import (
-	"net/http"
-	"crypto/tls"
-	"net/http/httputil"
-	"net"
 	"bitbucket.org/MountAim/go-util/netutil"
 	"bytes"
-	"io/ioutil"
-	"io"
+	"crypto/tls"
 	"encoding/json"
+	"io"
+	"io/ioutil"
+	"net"
+	"net/http"
+	"net/http/httputil"
 )
 
 func WriteJson(data interface{}, w http.ResponseWriter, r *http.Request) error {
@@ -161,9 +161,9 @@ func (self *ServeMux) Add(mux *ServeMux) {
 	}
 }
 
-func (self *ServeMux) HttpMux() *http.ServeMux {
+func (self *ServeMux) HttpMux(auth *HttpAuth) *http.ServeMux {
 	m := http.NewServeMux()
-	self.AppendTo(m)
+	self.AppendTo(m, auth)
 	return m
 }
 
@@ -171,9 +171,13 @@ type Muxator interface {
 	Handle(pattern string, handler http.Handler)
 }
 
-func (self *ServeMux) AppendTo(m Muxator) {
+func (self *ServeMux) AppendTo(m Muxator, auth *HttpAuth) {
 	for p, h := range self.muxs {
-		m.Handle(p, h)
+		if auth != nil {
+			m.Handle(p, auth.AuthHandler(h))
+		} else {
+			m.Handle(p, h)
+		}
 	}
 }
 

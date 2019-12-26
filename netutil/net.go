@@ -1,10 +1,10 @@
 package netutil
 
 import (
-	"net"
-	"strings"
-	"strconv"
 	"encoding/binary"
+	"net"
+	"strconv"
+	"strings"
 )
 
 func GetIpFromAddr(addr net.Addr) net.IP {
@@ -62,6 +62,10 @@ func SplitHostPort(s string) (string, int) {
 	return host, port
 }
 
+func JoinHostPort(host string, port int) string {
+	return net.JoinHostPort(host, strconv.Itoa(port))
+}
+
 func MustParseCIDR(s string) *net.IPNet {
 	_, ipnet, err := net.ParseCIDR(s)
 	if err != nil {
@@ -98,4 +102,27 @@ func IpRangeToCIDR(ipFrom net.IP, ipTo net.IP) *net.IPNet {
 	}
 
 	return nil
+}
+
+func GetLocalAddresses() ([]string, error) {
+	var res []string
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return res, err
+	}
+	for _, i := range ifaces {
+		addrs, err := i.Addrs()
+		if err != nil {
+			return res, err
+		}
+
+		for _, a := range addrs {
+			switch v := a.(type) {
+			case *net.IPAddr:
+				res = append(res, v.String())
+			}
+		}
+	}
+
+	return res, nil
 }
