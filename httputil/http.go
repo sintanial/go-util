@@ -1,16 +1,34 @@
 package httputil
 
 import (
-	"bitbucket.org/MountAim/go-util/netutil"
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
+	"github.com/sintanial/go-util/netutil"
 	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httputil"
 )
+
+func IsJsonContentType(r *http.Request) bool {
+	return r.Header.Get("Content-Type") == "application/json"
+}
+
+func ReadJson(data interface{}, r *http.Request) error {
+	if !IsJsonContentType(r) {
+		return errors.New("invalid content-type, must be json")
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(body, data)
+}
 
 func WriteJson(data interface{}, w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("Content-Type", "application/json")
