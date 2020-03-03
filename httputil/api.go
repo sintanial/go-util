@@ -31,10 +31,10 @@ func WriteFailedApiResponse(w http.ResponseWriter, r *http.Request, reason strin
 type ApiHandler func(w http.ResponseWriter, r *http.Request) (interface{}, error)
 
 func WrapApiHandler(handler ApiHandler) http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
-		data, err := handler(writer, request)
+	return func(w http.ResponseWriter, r *http.Request) {
+		data, err := handler(w, r)
 		if err == nil {
-			SuccessApiResponse(data)
+			WriteSuccessApiResponse(w, r, data)
 			return
 		}
 
@@ -43,7 +43,7 @@ func WrapApiHandler(handler ApiHandler) http.HandlerFunc {
 			msg = merry.Message(err)
 		}
 
-		FailedApiResponse(msg)
+		WriteFailedApiResponse(w, r, msg)
 
 		lerry.Log(err)
 	}
