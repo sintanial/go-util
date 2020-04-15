@@ -179,6 +179,28 @@ func (self *ServeMux) Add(mux *ServeMux) {
 	}
 }
 
+type MiddlewareFunc func(handler http.Handler) http.Handler
+
+func (self *ServeMux) Middleware(pattern string, fn MiddlewareFunc) bool {
+	if self.muxs == nil {
+		return false
+	}
+
+	original, ok := self.muxs[pattern]
+	if !ok {
+		return false
+	}
+
+	self.muxs[pattern] = fn(original)
+	return true
+}
+
+func (self *ServeMux) MiddlewareAll(fn MiddlewareFunc) {
+	for pattern, handler := range self.muxs {
+		self.muxs[pattern] = fn(handler)
+	}
+}
+
 func (self *ServeMux) HttpMux(auth *HttpAuth) *http.ServeMux {
 	m := http.NewServeMux()
 	self.AppendTo(m, auth)
