@@ -61,6 +61,22 @@ func (self *ServeMux) MiddlewareAll(fn MiddlewareFunc) {
 	}
 }
 
+func (self *ServeMux) HttpMux() *http.ServeMux {
+	m := http.NewServeMux()
+	self.AppendTo(m)
+	return m
+}
+
+type Muxator interface {
+	Handle(pattern string, handler http.Handler)
+}
+
+func (self *ServeMux) AppendTo(m Muxator) {
+	for p, h := range self.muxs {
+		m.Handle(p, h)
+	}
+}
+
 func MuxCombine(mux ...*ServeMux) *ServeMux {
 	res := &ServeMux{}
 	for _, m := range mux {
@@ -69,4 +85,3 @@ func MuxCombine(mux ...*ServeMux) *ServeMux {
 
 	return res
 }
-
